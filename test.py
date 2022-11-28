@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import cv2
+import Function as fun
 from scipy import signal
 
 if __name__ == '__main__':
@@ -20,45 +21,17 @@ if __name__ == '__main__':
         imgageIn=cv2.cvtColor(imgageIn, cv2.COLOR_BGR2GRAY)
         imgageIn = np.double(imgageIn / 255)
 
-    # cv2.imshow('ss',imgageIn)
-    # cv2.waitKey()
-    # cv2.destroyWindow()
-
-
-
-    # print(imgageIn)
-    # plt.imshow(imgageIn, cmap="gray")
-    # plt.show()
-
-
     mylambda=532E-6     #波长
-    k=2*np.pi/mylambda      #
+    k=2*np.pi/mylambda
 
     dp=5E-3
-    sizexSLM = w*dp  # 空间光调制器尺寸
-    sizeySLM = h*dp
-    z = 260
-    xx=np.arange(-sizexSLM/2,sizexSLM/2,dp)
-    yy = np.arange(-sizeySLM / 2, sizeySLM / 2, dp)
 
-    XX ,YY=np.meshgrid(xx,yy)
-    h=np.exp(1j*k*(XX**2+YY**2)/(2*z))      #卷积核
+    img,k=fun.propagation_TF(imgageIn,mylambda,dp,100)
+    img=fun.propagation_Len(img,k,dp,50,5)
+    img,k=fun.propagation_TF(img,mylambda,dp,100)
 
-    # img=signal.convolve2d(imgageIn,h,boundary='symm',mode='same')
-    H=np.fft.fftshift(np.fft.fft2(h))
-    F=np.fft.fft2(np.fft.fftshift(imgageIn))
-    img=F*H
-    img1=np.fft.fftshift(np.fft.ifft2(img))
-    out=np.exp(1j*k*z*img1/(1j*mylambda*z))      #
-    ot=np.abs(out)
+    imgout=np.abs(img)
 
-    # outc=np.conj(out)
-    # F=np.fft.fft2(np.fft.fftshift(outc))
-    # res=F*H
-    # opt=np.fft.fft2(np.fft.fftshift(res))
-    plt.imshow(ot, cmap="gray")
+    print("ASdga")
+    plt.imshow(imgout, cmap="gray")
     plt.show()
-
-
-
-
